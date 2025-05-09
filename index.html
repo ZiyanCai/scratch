@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>刮刮乐展示图</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f6f6f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+    #scratch-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      background: url('https://files.oaiusercontent.com/file-NdbVjaym9Q7xhZpmCfNLQD?se=2025-05-09T08%3A30%3A00Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/jpeg') center/cover no-repeat;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    #text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #444;
+      font-size: 22px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="scratch-container">
+    <canvas id="scratch-canvas" width="400" height="400"></canvas>
+    <div id="text">刮开看看吧！</div>
+  </div>
+  <script>
+    const canvas = document.getElementById('scratch-canvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    // 创建遮罩层
+    function initMask() {
+      ctx.fillStyle = '#ccc';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchstart', () => isDrawing = true);
+    canvas.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('touchmove', e => {
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      draw({ offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top });
+      e.preventDefault();
+    }, { passive: false });
+
+    function draw(e) {
+      if (!isDrawing) return;
+      const x = e.offsetX;
+      const y = e.offsetY;
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    initMask();
+  </script>
+</body>
+</html>
